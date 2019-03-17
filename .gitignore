@@ -10,3 +10,12 @@ buildNumber.properties
 
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
 !/.mvn/wrapper/maven-wrapper.jar
+
+logs
+.idea
+*.iml
+atlassian-ide-plugin.xml
+dependency-tree.txt
+effective-pom.xml
+hs_err_pid*
+dep-analyze.txt
