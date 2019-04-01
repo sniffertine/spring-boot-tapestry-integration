@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Created by code8 on 11/8/15.
+ *
  */
 @Component
 public class TapestryFilter extends FilterRegistrationBean implements Filter {

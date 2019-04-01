@@ -10,7 +10,7 @@ import org.apache.tapestry5.services.AssetSource;
 import java.util.Locale;
 
 /**
- * Created by code8 on 11/9/15.
+ * Fix asset loading in tapestry. Convert asset path to use classpath: prefix (instead of context:) and use META-INF/assets
  */
 public class AssetSourceModule {
     @Decorate(serviceInterface = AssetSource.class)
@@ -57,8 +57,8 @@ public class AssetSourceModule {
                 return origin.getComponentAsset(resources, convert(path), libraryName);
             }
 
-            private String convert(String path) {
-                String originalPath = path;
+            private String convert(String originalPath) {
+                String path = originalPath;
                 if (path.contains("context:")) {
                     path = path.replace("context:", "classpath:");
 

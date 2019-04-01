@@ -1,17 +1,18 @@
-package ch.baurs.spring.integration.tapestry;
+package ch.baurs.spring.integration.tapestry.itgtest;
 
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 /**
- * Created by code8 on 12/10/15.
+ *
  */
 @SpringBootApplication
-public class Launcher {
+public class TestBootApplication {
     public static void main(String[] args) {
-        new SpringApplicationBuilder(Launcher.class)
+        new SpringApplicationBuilder(TestBootApplication.class)
                 .web(WebApplicationType.SERVLET)
                 .run(args);
     }
+
 }

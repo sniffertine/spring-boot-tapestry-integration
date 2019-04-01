@@ -13,8 +13,7 @@ import org.springframework.core.Ordered;
  *
  * @see TapestryBeanFactoryPostProcessor for implementation details
  */
-public class TapestryApplicationContextinitializer
-        implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
+public class TapestryApplicationContextinitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
 
     private static final Logger logger = LoggerFactory.getLogger(TapestryApplicationContextinitializer.class);
 
@@ -30,13 +29,14 @@ public class TapestryApplicationContextinitializer
             tapestryBeanFactoryPostProcessor = new TapestryBeanFactoryPostProcessor((AnnotationConfigServletWebServerApplicationContext) applicationContext);
             applicationContext.addBeanFactoryPostProcessor(tapestryBeanFactoryPostProcessor);
         } else {
-            logger.warn("TB: tapestry-spring-boot works only with EmbeddedWebApplicationContext (Supplied context class was"
+            LogHelper.warn("TB: tapestry-spring-boot works only with EmbeddedWebApplicationContext (Supplied context class was"
                     + applicationContext.getClass() + ") delaying initialization");
         }
     }
 
     @Override
     public int getOrder() {
+        //execute at the very start
         return Ordered.LOWEST_PRECEDENCE;
     }
 

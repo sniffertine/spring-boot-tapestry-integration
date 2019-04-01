@@ -10,48 +10,41 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Created by code8 on 11/8/15.
+ * Wrapper class to register Spring services in Tapestry.
  */
-public class SpringBeanServiceDef implements ServiceDef2
-{
+public class SpringBeanServiceDef implements ServiceDef2 {
+
     private final String beanName;
 
     private final ApplicationContext context;
 
-    public SpringBeanServiceDef(String beanName, ApplicationContext context)
-    {
+    public SpringBeanServiceDef(String beanName, ApplicationContext context) {
         this.beanName = beanName;
         this.context = context;
     }
 
     @Override
-    public boolean isPreventDecoration()
-    {
+    public boolean isPreventDecoration() {
         return true;
     }
 
     @Override
-    public ObjectCreator createServiceCreator(ServiceBuilderResources resources)
-    {
-        return new ObjectCreator()
-        {
+    public ObjectCreator createServiceCreator(ServiceBuilderResources resources) {
+        return new ObjectCreator() {
             @Override
-            public Object createObject()
-            {
+            public Object createObject() {
                 return context.getBean(beanName);
             }
 
             @Override
-            public String toString()
-            {
+            public String toString() {
                 return String.format("ObjectCreator<Spring Bean '%s'>", beanName);
             }
         };
     }
 
     @Override
-    public String getServiceId()
-    {
+    public String getServiceId() {
         return beanName;
     }
 
@@ -74,5 +67,6 @@ public class SpringBeanServiceDef implements ServiceDef2
     public boolean isEagerLoad() {
         return false;
     }
+
 }
 

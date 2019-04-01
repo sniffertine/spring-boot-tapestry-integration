@@ -6,38 +6,33 @@ import org.apache.tapestry5.internal.SingleKeySymbolProvider;
 import org.apache.tapestry5.internal.TapestryAppInitializer;
 import org.apache.tapestry5.internal.util.DelegatingSymbolProvider;
 import org.apache.tapestry5.ioc.Registry;
-import org.apache.tapestry5.ioc.internal.services.SystemPropertiesSymbolProvider;
 import org.apache.tapestry5.ioc.services.ServiceActivityScoreboard;
 import org.apache.tapestry5.ioc.services.SymbolProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Created by code8 on 11/6/15.
+ * Post-processor that orchestrates the whole integration
  */
+public class TapestryBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
-public class TapestryBeanFactoryPostProcessor
-        implements BeanFactoryPostProcessor, Ordered {
+    public static final String SPRING_CONTEXT_PATH = "server.servlet.context-path";
+    public static final String PROPERTY_APPMODULE = "spring.tapestry.integration.appmodule";
 
-    private static final Logger logger = LoggerFactory.getLogger(TapestryBeanFactoryPostProcessor.class);
     protected final AnnotationConfigServletWebServerApplicationContext applicationContext;
+
     private Registry registry = null;
     private TapestryAppInitializer appInitializer = null;
 
@@ -46,26 +41,19 @@ public class TapestryBeanFactoryPostProcessor
         this.applicationContext = applicationContext;
     }
 
-    public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
-    }
-
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        Collection<String> packagesToScan = findPackagesToScan(applicationContext);
-        String appModuleClass = findAppModule(packagesToScan, applicationContext.getEnvironment());
-        
-
+        String appModuleClass = findAppModuleClass(applicationContext.getEnvironment());
         String filterName = appModuleClass.substring(appModuleClass.lastIndexOf('.') + 1).replace("Module", "");
         SymbolProvider combinedProvider = setupTapestryContext(appModuleClass, filterName);
         String executionMode = combinedProvider.valueForSymbol(SymbolConstants.EXECUTION_MODE);
-        logger.info("TB: About to start Tapestry app module: {}, filterName: {}, executionMode: {} ", appModuleClass, filterName, executionMode);
-        appInitializer = new TapestryAppInitializer(logger, combinedProvider, filterName, executionMode);
+        LogHelper.info("TB: About to start Tapestry app module: {}, filterName: {}, executionMode: {} ", appModuleClass, filterName, executionMode);
+        appInitializer = new TapestryAppInitializer(LogHelper.LOG, combinedProvider, filterName, executionMode);
         appInitializer.addModules(new SpringModuleDef(applicationContext));
         appInitializer.addModules(AssetSourceModule.class);
-        logger.info("TB: creating tapestry registry");
+        LogHelper.info("TB: creating tapestry registry");
         registry = appInitializer.createRegistry();
-        
+
         beanFactory.addBeanPostProcessor(new TapestryFilterPostProcessor());
 
         registerTapestryServices(applicationContext.getBeanFactory(),
@@ -80,14 +68,15 @@ public class TapestryBeanFactoryPostProcessor
     }
 
     private class TapestryFilterPostProcessor implements BeanPostProcessor {
+
         @Override
         public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
             if (bean.getClass() == TapestryFilter.class) {
-                logger.info("TB: About to start TapestryFilter, begin Registry initialization");
+                LogHelper.info("TB: About to start TapestryFilter, begin Registry initialization");
                 registry.performRegistryStartup();
                 registry.cleanupThread();
                 appInitializer.announceStartup();
-                logger.info("TB: About to start TapestryFilter, Registry initialization complete");
+                LogHelper.info("TB: About to start TapestryFilter, Registry initialization complete");
             }
             return bean;
         }
@@ -105,7 +94,8 @@ public class TapestryBeanFactoryPostProcessor
 
         tapestryContext.put("tapestry.filter-name", filterName);
 
-        String servletContextPath = environment.getProperty(SymbolConstants.CONTEXT_PATH, "");
+        //read contextPath from two possible properties
+        String servletContextPath = environment.getProperty(SymbolConstants.CONTEXT_PATH, environment.getProperty(SPRING_CONTEXT_PATH, ""));
         tapestryContext.put(SymbolConstants.CONTEXT_PATH, servletContextPath);
 
         String executionMode = environment.getProperty(SymbolConstants.EXECUTION_MODE, "production");
@@ -117,45 +107,51 @@ public class TapestryBeanFactoryPostProcessor
         environment.getPropertySources().addFirst(new MapPropertySource("tapestry-context", tapestryContext));
 
         return new DelegatingSymbolProvider(
-                new SystemPropertiesSymbolProvider(),
+                //TODO confirm not needed new SystemPropertiesSymbolProvider(),
+                new ApplicationContextSymbolProvider(applicationContext),
                 new SingleKeySymbolProvider(SymbolConstants.CONTEXT_PATH, servletContextPath),
                 new SingleKeySymbolProvider(InternalConstants.TAPESTRY_APP_PACKAGE_PARAM, rootPackageName),
-                new SingleKeySymbolProvider(SymbolConstants.EXECUTION_MODE, executionMode));
+                new SingleKeySymbolProvider(SymbolConstants.EXECUTION_MODE, executionMode)
+        );
     }
 
-    protected Collection<String> findPackagesToScan(ConfigurableApplicationContext applicationContext) {
-        Set<String> packages = new HashSet<>();
-        Object springApplication = applicationContext.getBeansWithAnnotation(SpringBootApplication.class).values().iterator()
-                .next();
-        packages.add(springApplication.getClass().getPackage().getName());
-        packages.add("ch.jasse");
-        return packages;
-    }
+    protected String findAppModuleClass(Environment environment) {
+        String appModuleClassName = environment.getProperty(PROPERTY_APPMODULE, "");
 
-    protected String findAppModule(Collection<String> packages, Environment environment) {
-        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false, environment);
-        scanner.addIncludeFilter(new AnnotationTypeFilter(TapestryApplication.class));
-        for (String pack : packages) {
-            Set<BeanDefinition> definitions = scanner.findCandidateComponents(pack);
-            if (!definitions.isEmpty()) {
-                return definitions.iterator().next().getBeanClassName();
-            }
+        if (StringUtils.isEmpty(appModuleClassName)) {
+            String message = String.format("Tapestry AppModule not found. Set the property '%s=<fqdn.of.AppModule>' in your environment (e.g. application.properties)", PROPERTY_APPMODULE);
+            throw new IllegalStateException(message);
         }
-        throw new RuntimeException("TapestryApplication not found. Use @TapestryApplication to mark module.");
+        LogHelper.info("Found Tapestry AppModule class: {} ", appModuleClassName);
+
+        return appModuleClassName;
     }
 
     protected void registerTapestryServices(ConfigurableListableBeanFactory beanFactory, String servicesPackage,
-            Registry registry) {
+                                            Registry registry) {
         ServiceActivityScoreboard scoreboard = registry.getService(ServiceActivityScoreboard.class);
         scoreboard.getServiceActivity().forEach(service -> {
             if (service.getServiceInterface().getPackage().getName().startsWith(servicesPackage)
                     || !service.getMarkers().isEmpty() || service.getServiceInterface().getName().contains("tapestry5")) {
                 Object proxy = registry.getService(service.getServiceId(), (Class<?>) service.getServiceInterface());
                 beanFactory.registerResolvableDependency(service.getServiceInterface(), proxy);
-                logger.debug("TB: tapestry service {} exposed to spring", service.getServiceId());
+                LogHelper.debug("TB: tapestry service {} exposed to spring", service.getServiceId());
             }
         });
         beanFactory.registerResolvableDependency(Registry.class, registry);
-        logger.info("TB: tapestry Registry registered with spring (Still pending initialization)");
+        LogHelper.info("TB: tapestry Registry registered with spring (Still pending initialization)");
     }
+
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE;
+    }
+
+    private static String defaultString(final String str) {
+        return defaultString(str, "");
+    }
+
+    private static String defaultString(final String str, final String defaultStr) {
+        return str == null ? defaultStr : str;
+    }
+
 }

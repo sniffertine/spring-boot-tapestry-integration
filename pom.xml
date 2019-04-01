@@ -7,15 +7,18 @@
     <groupId>ch.baurs</groupId>
     <artifactId>spring-boot-tapestry-integration</artifactId>
     <name>Spring Boot 2 and Tapestry 5 integration module</name>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
 
     <properties>
 
         <!-- DEPENDENCIES -->
         <version.spring-boot>2.1.3.RELEASE</version.spring-boot>
         <version.tapestry>5.5.0-SNAPSHOT</version.tapestry>
+        <version.servlet-api>3.1.0</version.servlet-api>
+
+
+        <!-- MAVEN PLUGINS -->
         <version.maven-compiler-plugin>3.8.0</version.maven-compiler-plugin>
-        <version.servlet-api-release>3.1.0</version.servlet-api-release>
 
 
         <!-- COMPILING -->
@@ -58,6 +61,24 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.11.3</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
@@ -68,22 +89,24 @@
             <!-- IMPORT -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
+                <artifactId>spring-boot-dependencies</artifactId>
                 <version>${version.spring-boot}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
 
             <!-- COMPILE -->
             <dependency>
                 <groupId>org.apache.tapestry</groupId>
                 <artifactId>tapestry-core</artifactId>
                 <version>${version.tapestry}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
-                <version>${version.servlet-api-release}</version>
+                <version>${version.servlet-api}</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -104,6 +127,12 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
 </project>
