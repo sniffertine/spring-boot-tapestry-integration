@@ -107,7 +107,6 @@ public class TapestryBeanFactoryPostProcessor implements BeanFactoryPostProcesso
         environment.getPropertySources().addFirst(new MapPropertySource("tapestry-context", tapestryContext));
 
         return new DelegatingSymbolProvider(
-                //TODO confirm not needed new SystemPropertiesSymbolProvider(),
                 new ApplicationContextSymbolProvider(applicationContext),
                 new SingleKeySymbolProvider(SymbolConstants.CONTEXT_PATH, servletContextPath),
                 new SingleKeySymbolProvider(InternalConstants.TAPESTRY_APP_PACKAGE_PARAM, rootPackageName),
