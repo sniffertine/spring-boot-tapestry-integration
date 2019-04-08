@@ -5,7 +5,7 @@
     <groupId>ch.baurs</groupId>
     <artifactId>spring-boot-tapestry-integration</artifactId>
     <name>Spring Boot 2 and Tapestry 5 integration module</name>
-    <version>0.9.0</version>
+    <version>0.9.1-SNAPSHOT</version>
 
     <developers>
         <developer>
@@ -23,7 +23,7 @@
         <url>https://github.com/sniffertine/spring-boot-tapestry-integration</url>
         <connection>scm:git:git://github.com/sniffertine/spring-boot-tapestry-integration.git</connection>
         <developerConnection>scm:git:git@github.com:sniffertine/spring-boot-tapestry-integration.git</developerConnection>
-        <tag>spring-boot-tapestry-integration-0.9.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
