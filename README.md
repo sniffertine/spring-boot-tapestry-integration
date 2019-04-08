@@ -3,7 +3,10 @@ A simple integration module for Tapestry 5.5.x into Spring Boot
 
 Originally copied from <https://github.com/code8/tapestry-boot> and refactored.
 
-To use spring-boot-tapestry-integration add a property marks tapestry application module with @TapestryApplication annotation.
+To use spring-boot-tapestry-integration add a new property to your Spring Boot environment:
+```
+spring.tapestry.integration.appmodule=my.fully.qualified.class.name.AppModule
+```
 
 
 Features:
