@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ch.baurs</groupId>
     <artifactId>spring-boot-tapestry-integration</artifactId>
     <name>Spring Boot 2 and Tapestry 5 integration module</name>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.9.0</version>
 
     <developers>
         <developer>
@@ -25,7 +23,7 @@
         <url>https://github.com/sniffertine/spring-boot-tapestry-integration</url>
         <connection>scm:git:git://github.com/sniffertine/spring-boot-tapestry-integration.git</connection>
         <developerConnection>scm:git:git@github.com:sniffertine/spring-boot-tapestry-integration.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>spring-boot-tapestry-integration-0.9.0</tag>
     </scm>
 
     <distributionManagement>
@@ -51,7 +49,7 @@
 
         <!-- DEPENDENCIES -->
         <version.spring-boot>2.1.3.RELEASE</version.spring-boot>
-        <version.tapestry>5.5.0-SNAPSHOT</version.tapestry>
+        <version.tapestry>5.5.0-beta-2</version.tapestry>
         <version.servlet-api>3.1.0</version.servlet-api>
 
 
@@ -257,4 +255,16 @@
         </profile>
     </profiles>
 
+    <repositories>
+        <repository>
+            <id>repository.apache.staging</id>
+            <url>https://repository.apache.org/content/repositories/staging</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
