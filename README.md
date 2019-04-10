@@ -9,11 +9,16 @@ spring.tapestry.integration.appmodule=my.fully.qualified.class.name.AppModule
 ```
 
 
-Features:
+## Usage
+
+1. Add dependency
+
+## Features
  - bootstraps tapestry framework inside embedded servlet container managed by spring-boot
  - configure tapestry using spring environment (e.g. application.properties)
  - provides injection of spring services in tapestry
  - provides injection of tapestry services in spring
 
-Example: see DemoApplicationTest.
+## Example 
+see DemoApplicationTest
 
