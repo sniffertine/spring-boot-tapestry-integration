@@ -1,4 +1,8 @@
-# spring-boot-tapestry-integration
+# Spring Boot - Tapestry integration
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.baurs/spring-boot-tapestry-integration/badge.svg?subject=Maven%20Central)](https://maven-badges.herokuapp.com/maven-central/ch.baurs/spring-boot-tapestry-integration/)
+[![License](https://img.shields.io/github/license/sniffertine/spring-boot-tapestry-integration.svg?color=blue&label=License)]()
+
 A simple integration module for Tapestry 5.5.x into Spring Boot
 
 Originally copied from <https://github.com/code8/tapestry-boot> and refactored.
@@ -11,7 +15,15 @@ spring.tapestry.integration.appmodule=my.fully.qualified.class.name.AppModule
 
 ## Usage
 
-1. Add dependency
+1. Add the dependency (use the newest version from Maven Central)
+
+            <dependency>
+                <groupId>ch.baurs</groupId>
+                <artifactId>spring-boot-tapestry-integration</artifactId>
+                <version>0.9.3</version>
+            </dependency>
+
+2. Define spring.tapestry.integration.appmodule in your application.properties
 
 ## Features
  - bootstraps tapestry framework inside embedded servlet container managed by spring-boot
