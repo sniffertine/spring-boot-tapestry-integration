@@ -54,7 +54,7 @@
         <tapestry.version>5.5.0-beta-2</tapestry.version>
         <servlet-api.version>3.1.0</servlet-api.version>
         <commons-io.version>2.6</commons-io.version>
-        <jsoup.version>1.11.3</jsoup.version>
+        <jsoup.version>1.14.2</jsoup.version>
 
 
         <!-- MAVEN PLUGINS -->
